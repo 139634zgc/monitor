@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitauto.bdc.modules.resource.monitor.dao.QueueDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.bitauto.bdc.modules.resource.monitor.entity.QueueEntity" id="queueMap">
+        <result property="id" column="id"/>
+        <result property="queueid" column="queueId"/>
+        <result property="queuename" column="queueName"/>
+        <result property="parentqueueid" column="parentQueueId"/>
+        <result property="queuepath" column="queuePath"/>
+        <result property="leaf" column="leaf"/>
+        <result property="inserttime" column="insertTime"/>
+        <result property="updatetime" column="updateTime"/>
+        <result property="desc" column="desc"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.bitauto.bdc.modules.resource.monitor.entity.QueueEntity">
+		select * from tb_queue where id = #{value}
+	</select>
+	
+	<select id="queryObjectByName" resultType="com.bitauto.bdc.modules.resource.monitor.entity.QueueEntity">
+		select * from tb_queue where queuePath = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.bitauto.bdc.modules.resource.monitor.entity.QueueEntity">
+		select * from tb_queue
+        <!-- <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if> -->
+	</select>
+	
+	<select id="leafQueryList" resultType="java.lang.String">
+		select queuePath from tb_queue where leaf = true
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tb_queue 
+	</select>
+	 
+	<insert id="save" parameterType="com.bitauto.bdc.modules.resource.monitor.entity.QueueEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_queue
+		(
+			`queueId`, 
+			`queueName`, 
+			`parentQueueId`, 
+			`queuePath`, 
+			`leaf`,
+			`insertTime`, 
+			`updateTime`, 
+			`desc`
+		)
+		values
+		(
+			#{queueid}, 
+			#{queuename}, 
+			#{parentqueueid}, 
+			#{queuepath},
+			#{leaf},  
+			now(), 
+			now(), 
+			#{desc}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bitauto.bdc.modules.resource.monitor.entity.QueueEntity">
+		update tb_queue 
+		<set>
+			<if test="queueid != null">`queueId` = #{queueid}, </if>
+			<if test="queuename != null">`queueName` = #{queuename}, </if>
+			<if test="parentqueueid != null">`parentQueueId` = #{parentqueueid}, </if>
+			<if test="queuepath != null">`queuePath` = #{queuepath}, </if>
+			<if test="queuepath != null">`leaf` = #{leaf}, </if>
+			<if test="updatetime != null">`insertTime` = #{updatetime}, </if>
+			`updateTime` = now(),
+			<if test="desc != null">`desc` = #{desc}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from tb_queue where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_queue where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

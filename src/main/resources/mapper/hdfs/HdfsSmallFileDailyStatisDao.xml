@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitauto.bdc.modules.hdfs.dao.HdfsSmallFileDailyStatisDao">
+
+    <resultMap type="com.bitauto.bdc.modules.hdfs.entity.HdfsSmallFileDailyStatisEntity" id="hdfsSmallFileDailyStatisEntityMap">
+        <result property="hdfsSmallfileDailystatisId" column="hdfs_smallfile_dailystatis_id"/>
+        <result property="smallFileCount" column="small_file_count"/>
+        <result property="smallDirCount" column="small_dir_count"/>
+        <result property="createDate" column="create_date"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="queryList" resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsSmallFileDailyStatisEntity">
+        select * from tb_hdfs_smallfile_dailystatis WHERE newest = 1
+        <if test="createDate != null and createDate.trim() != ''">
+            and `create_date` like concat('%',#{createDate},'%')
+        </if>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+            <otherwise>
+                order by hdfs_smallfile_dailystatis_id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from tb_hdfs_smallfile_dailystatis WHERE newest = 1
+        <if test="createDate != null and createDate.trim() != ''">
+            and `create_date` like concat('%',#{createDate},'%')
+        </if>
+    </select>
+
+    <insert id="save" parameterType="com.bitauto.bdc.modules.hdfs.entity.HdfsSmallFileDailyStatisEntity" useGeneratedKeys="true" keyProperty="hdfsSmallfileDailystatisId">
+        insert into tb_hdfs_smallfile_dailystatis
+        (
+        `small_file_count`,
+        `small_dir_count`,
+        `create_date`,
+        `create_time`
+        )
+        values
+        (
+        #{smallFileCount},
+        #{smallDirCount},
+        #{createDate},
+        #{createTime}
+        )
+    </insert>
+
+    <update id="updateNewestByDate" parameterType="java.lang.String">
+        update tb_hdfs_smallfile_dailystatis set `newest` = 0
+        where `create_date` = #{createDate,jdbcType=VARCHAR}
+        AND `newest` = 1
+    </update>
+</mapper>

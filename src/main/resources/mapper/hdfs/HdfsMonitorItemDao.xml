@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitauto.bdc.modules.hdfs.dao.HdfsMonitorItemDao">
+
+    <resultMap type="com.bitauto.bdc.modules.hdfs.entity.HdfsMonitorItemEntity" id="hdfsMonitorItemMap">
+        <result property="hdfsMonitorItemId" column="hdfs_monitor_item_id"/>
+        <result property="fileCount" column="file_count"/>
+        <result property="blockCount" column="block_count"/>
+        <result property="totalDisk" column="total_disk"/>
+        <result property="usedDisk" column="used_disk"/>
+        <result property="increaseDisk" column="increase_disk"/>
+        <result property="namenodeUsedMomory" column="namenode_used_momory"/>
+        <result property="namenodeTotalMomory" column="namenode_total_momory"/>
+        <result property="createDate" column="create_date"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="queryList" resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsMonitorItemEntity">
+        select * from tb_hdfs_monitor_item WHERE newest = 1
+        <if test="createDate != null and createDate.trim() != ''">
+            and `create_date` like concat('%',#{createDate},'%')
+        </if>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+            <otherwise>
+                order by hdfs_monitor_item_id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from tb_hdfs_monitor_item WHERE newest = 1
+        <if test="createDate != null and createDate.trim() != ''">
+            and `create_date` like concat('%',#{createDate},'%')
+        </if>
+    </select>
+
+    <insert id="save" parameterType="com.bitauto.bdc.modules.hdfs.entity.HdfsMonitorItemEntity" useGeneratedKeys="true" keyProperty="hdfsMonitorItemId">
+        insert into tb_hdfs_monitor_item
+        (
+        `file_count`,
+        `block_count`,
+        `total_disk`,
+        `used_disk`,
+        `namenode_used_momory`,
+        `namenode_total_momory`,
+        `create_date`,
+        `create_time`
+        )
+        values
+        (
+        #{fileCount},
+        #{blockCount},
+        #{totalDisk},
+        #{usedDisk},
+        #{namenodeUsedMomory},
+        #{namenodeTotalMomory},
+        #{createDate},
+        #{createTime}
+        )
+    </insert>
+
+    <update id="updateNewestByDate" parameterType="java.lang.String">
+        update tb_hdfs_monitor_item set `newest` = 0
+        where `create_date` = #{createDate,jdbcType=VARCHAR}
+        AND `newest` = 1
+    </update>
+
+    <select id="queryNewestDiskByDate" resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsMonitorItemEntity">
+        select * from tb_hdfs_monitor_item
+        WHERE `create_date` = #{value} and `newest` = 1
+        ORDER BY create_time DESC LIMIT 1
+    </select>
+
+    <select id="queryOldestDiskByDate" resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsMonitorItemEntity">
+        select * from tb_hdfs_monitor_item
+        WHERE create_date = #{value} and `newest` = 1
+        ORDER BY create_time ASC LIMIT 1
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.bitauto.bdc.modules.hdfs.entity.HdfsMonitorItemEntity">
+        UPDATE tb_hdfs_monitor_item
+        <set>
+            <if test="increaseDisk != null" >
+                increase_disk = #{increaseDisk,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where hdfs_monitor_item_id = #{hdfsMonitorItemId,jdbcType=INTEGER}
+    </update>
+</mapper>

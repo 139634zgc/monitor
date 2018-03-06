@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitauto.bdc.modules.resource.monitor.dao.SchedulerDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.bitauto.bdc.modules.resource.monitor.entity.SchedulerEntity" id="schedulerMap">
+        <result property="id" column="id"/>
+        <result property="maxapps" column="maxApps"/>
+        <result property="minresMem" column="minRes_mem"/>
+        <result property="minresCpu" column="minRes_cpu"/>
+        <result property="maxresMem" column="maxRes_mem"/>
+        <result property="maxresCpu" column="maxRes_cpu"/>
+        <result property="usedresMem" column="usedRes_mem"/>
+        <result property="usedresCpu" column="usedRes_cpu"/>
+        <result property="steadyfairresMem" column="steadyFairRes_mem"/>
+        <result property="steadyfairresCpu" column="steadyFairRes_cpu"/>
+        <result property="fairresMem" column="fairRes_mem"/>
+        <result property="fairresCpu" column="fairRes_cpu"/>
+        <result property="clusterresMem" column="clusterRes_mem"/>
+        <result property="clusterresCpu" column="clusterRes_cpu"/>
+        <result property="pendingcountainers" column="pendingCountainers"/>
+        <result property="allocatedcontainers" column="allocatedContainers"/>
+        <result property="reservedcontainers" column="reservedContainers"/>
+        <result property="queuename" column="queueName"/>
+        <result property="schedulingpolicy" column="schedulingPolicy"/>
+        <result property="preemptable" column="preemptable"/>
+        <result property="numPendingApps" column="numPendingApps"/>
+        <result property="numActiveApps" column="numActiveApps"/>
+        <result property="inserttime" column="insertTime"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="com.bitauto.bdc.modules.resource.monitor.entity.SchedulerEntity">
+		select * from tb_scheduler where id = #{value}
+	</select>
+	
+	<resultMap type="com.bitauto.bdc.modules.resource.monitor.entity.SchedulerEntity" id="sheduleList">
+        <result property="queuename" column="queueName"/>
+        <result property="usedresMem" column="usedRes_mem"/>
+        <result property="usedresCpu" column="usedRes_cpu"/>
+        <result property="inserttime" column="insertTime"/>
+    </resultMap>
+
+	<select id="queryList" resultMap="sheduleList">
+		select queuename,usedRes_mem,usedRes_cpu,insertTime from tb_scheduler where inserttime &gt;= #{startTime} and insertTime &lt;= #{endTime}
+        <!-- <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if> -->
+	</select>
+	
+	<resultMap type="com.bitauto.bdc.modules.resource.monitor.entity.SchedulerEntity" id="queueMap">
+        <result property="usedresMem" column="usedRes_mem"/>
+        <result property="usedresCpu" column="usedRes_cpu"/>
+        <result property="steadyfairresMem" column="steadyFairRes_mem"/>
+        <result property="steadyfairresCpu" column="steadyFairRes_cpu"/>
+        <result property="queuename" column="queueName"/>
+        <result property="inserttime" column="insertTime"/>
+        <result property="clusterresMem" column="clusterRes_mem"/>
+        <result property="clusterresCpu" column="clusterRes_cpu"/>
+    </resultMap>
+    
+	<select id="queueMonitor" resultMap="queueMap">
+		select queuename,usedRes_mem,usedRes_cpu,steadyFairRes_mem,steadyFairRes_cpu,clusterRes_mem,clusterRes_cpu,insertTime from tb_scheduler where inserttime &gt;= #{startTime} and insertTime &lt;= #{endTime} and queuename=#{queueName}
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tb_scheduler 
+	</select>
+	 
+	<insert id="save" parameterType="com.bitauto.bdc.modules.resource.monitor.entity.SchedulerEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_scheduler
+		(
+			`maxApps`, 
+			`minRes_mem`, 
+			`minRes_cpu`, 
+			`maxRes_mem`, 
+			`maxRes_cpu`, 
+			`usedRes_mem`, 
+			`usedRes_cpu`, 
+			`steadyFairRes_mem`, 
+			`steadyFairRes_cpu`, 
+			`fairRes_mem`, 
+			`fairRes_cpu`, 
+			`clusterRes_mem`, 
+			`clusterRes_cpu`, 
+			`pendingCountainers`, 
+			`allocatedContainers`, 
+			`reservedContainers`, 
+			`queueName`, 
+			`schedulingPolicy`,
+			`preemptable`,
+			`numPendingApps`,
+			`numActiveApps`,
+			`insertTime`
+		)
+		values
+		(
+			#{maxapps}, 
+			#{minresMem}, 
+			#{minresCpu}, 
+			#{maxresMem}, 
+			#{maxresCpu}, 
+			#{usedresMem}, 
+			#{usedresCpu}, 
+			#{steadyfairresMem}, 
+			#{steadyfairresCpu}, 
+			#{fairresMem}, 
+			#{fairresCpu}, 
+			#{clusterresMem}, 
+			#{clusterresCpu}, 
+			#{pendingcountainers}, 
+			#{allocatedcontainers}, 
+			#{reservedcontainers}, 
+			#{queuename}, 
+			#{schedulingpolicy}, 
+			#{preemptable},
+			#{numPendingApps},
+			#{numActiveApps},
+			#{inserttime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bitauto.bdc.modules.resource.monitor.entity.SchedulerEntity">
+		update tb_scheduler 
+		<set>
+			<if test="maxapps != null">`maxApps` = #{maxapps}, </if>
+			<if test="minresMem != null">`minRes_mem` = #{minresMem}, </if>
+			<if test="minresCpu != null">`minRes_cpu` = #{minresCpu}, </if>
+			<if test="maxresMem != null">`maxRes_mem` = #{maxresMem}, </if>
+			<if test="maxresCpu != null">`maxRes_cpu` = #{maxresCpu}, </if>
+			<if test="usedresMem != null">`usedRes_mem` = #{usedresMem}, </if>
+			<if test="usedresCpu != null">`usedRes_cpu` = #{usedresCpu}, </if>
+			<if test="steadyfairresMem != null">`steadyFairRes_mem` = #{steadyfairresMem}, </if>
+			<if test="steadyfairresCpu != null">`steadyFairRes_cpu` = #{steadyfairresCpu}, </if>
+			<if test="fairresMem != null">`fairRes_mem` = #{fairresMem}, </if>
+			<if test="fairresCpu != null">`fairRes_cpu` = #{fairresCpu}, </if>
+			<if test="clusterresMem != null">`clusterRes_mem` = #{clusterresMem}, </if>
+			<if test="clusterresCpu != null">`clusterRes_cpu` = #{clusterresCpu}, </if>
+			<if test="pendingcountainers != null">`pendingCountainers` = #{pendingcountainers}, </if>
+			<if test="allocatedcontainers != null">`allocatedContainers` = #{allocatedcontainers}, </if>
+			<if test="reservedcontainers != null">`reservedContainers` = #{reservedcontainers}, </if>
+			<if test="queuename != null">`queueName` = #{queuename}, </if>
+			<if test="schedulingpolicy != null">`schedulingPolicy` = #{schedulingpolicy}, </if>
+			<if test="preemptable != null">`preemptable` = #{preemptable}, </if>
+			<if test="numPendingApps != null">`numPendingApps` = #{numPendingApps}, </if>
+			<if test="numActiveApps != null">`numActiveApps` = #{numActiveApps}, </if>
+			<if test="inserttime != null">`insertTime` = #{inserttime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from tb_scheduler where id = #{value}
+	</delete>
+	
+	<delete id="deleteByInsertTime">
+		delete from tb_scheduler where inserttime &lt;= #{oldTime}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_scheduler where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

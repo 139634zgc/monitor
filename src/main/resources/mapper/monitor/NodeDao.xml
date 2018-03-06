@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitauto.bdc.modules.resource.monitor.dao.NodeDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.bitauto.bdc.modules.resource.monitor.entity.NodeEntity" id="nodeMap">
+        <result property="id" column="id"/>
+        <result property="rack" column="rack"/>
+        <result property="state" column="state"/>
+        <result property="nodeid" column="nodeId"/>
+        <result property="nodehostname" column="nodeHostName"/>
+        <result property="nodehttpaddress" column="nodeHttpAddress"/>
+        <result property="healthreport" column="healthReport"/>
+        <result property="lasthealthupdate" column="lastHealthUpdate"/>
+        <result property="usedmemorymb" column="usedMemoryMB"/>
+        <result property="availmemorymb" column="availMemoryMB"/>
+        <result property="usedvirtualcores" column="usedVirtualCores"/>
+        <result property="availablevirtualcores" column="availableVirtualCores"/>
+        <result property="numcontainers" column="numContainers"/>
+        <result property="inserttime" column="insertTime"/>
+    </resultMap>
+	<select id="queryObject" resultType="com.bitauto.bdc.modules.resource.monitor.entity.NodeEntity">
+		select * from tb_node where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="com.bitauto.bdc.modules.resource.monitor.entity.NodeEntity">
+		select * from tb_node
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from tb_node 
+	</select>
+	 
+	<insert id="save" parameterType="com.bitauto.bdc.modules.resource.monitor.entity.NodeEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into tb_node
+		(
+			`rack`, 
+			`state`, 
+			`nodeId`, 
+			`nodeHostName`, 
+			`nodeHttpAddress`, 
+			`healthReport`, 
+			`lastHealthUpdate`, 
+			`usedMemoryMB`, 
+			`availMemoryMB`, 
+			`usedVirtualCores`, 
+			`availableVirtualCores`, 
+			`numContainers`, 
+			`insertTime`
+		)
+		values
+		(
+			#{rack}, 
+			#{state}, 
+			#{nodeid}, 
+			#{nodehostname}, 
+			#{nodehttpaddress}, 
+			#{healthreport}, 
+			#{lasthealthupdate}, 
+			#{usedmemorymb}, 
+			#{availmemorymb}, 
+			#{usedvirtualcores}, 
+			#{availablevirtualcores}, 
+			#{numcontainers}, 
+			#{inserttime}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bitauto.bdc.modules.resource.monitor.entity.NodeEntity">
+		update tb_node 
+		<set>
+			<if test="rack != null">`rack` = #{rack}, </if>
+			<if test="state != null">`state` = #{state}, </if>
+			<if test="nodeid != null">`nodeId` = #{nodeid}, </if>
+			<if test="nodehostname != null">`nodeHostName` = #{nodehostname}, </if>
+			<if test="nodehttpaddress != null">`nodeHttpAddress` = #{nodehttpaddress}, </if>
+			<if test="healthreport != null">`healthReport` = #{healthreport}, </if>
+			<if test="lasthealthupdate != null">`lastHealthUpdate` = #{lasthealthupdate}, </if>
+			<if test="usedmemorymb != null">`usedMemoryMB` = #{usedmemorymb}, </if>
+			<if test="availmemorymb != null">`availMemoryMB` = #{availmemorymb}, </if>
+			<if test="usedvirtualcores != null">`usedVirtualCores` = #{usedvirtualcores}, </if>
+			<if test="availablevirtualcores != null">`availableVirtualCores` = #{availablevirtualcores}, </if>
+			<if test="numcontainers != null">`numContainers` = #{numcontainers}, </if>
+			<if test="inserttime != null">`insertTime` = #{inserttime}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from tb_node where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from tb_node where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

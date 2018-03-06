@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitauto.bdc.modules.hdfs.dao.HdfsTableDao">
+
+    <resultMap type="com.bitauto.bdc.modules.hdfs.entity.HdfsTableEntity" id="hdfsTableMap">
+        <result property="dbOwner" column="DB_OWNER"/>
+        <result property="tblId" column="TBL_ID"/>
+        <result property="dbId" column="DB_ID"/>
+        <result property="tblName" column="TBL_NAME"/>
+        <result property="tblOwner" column="TBL_OWNER"/>
+        <result property="dbLocation" column="DB_LOCATION"/>
+        <result property="dbName" column="DB_NAME"/>
+        <result property="tblLocation" column="TBL_LOCATION"/>
+    </resultMap>
+
+    <select id="queryList" resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsTableEntity">
+        select s.LOCATION as TBL_LOCATION,d.DB_LOCATION_URI as DB_LOCATION,d.NAME as DB_NAME,d.OWNER_NAME as DB_OWNER, t.TBL_ID,t.CREATE_TIME as TBL_CREATE_TIME,t.DB_ID,t.OWNER as TBL_OWNER,t.TBL_NAME
+        from TBLS t left join  SDS s on t.SD_ID=s.SD_ID
+        left join DBS d  on d.DB_ID=t.DB_ID
+    </select>
+
+    <select id="queryDbList" resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsTableEntity">
+        select DB_LOCATION_URI as DB_LOCATION, NAME as DB_NAME, OWNER_NAME as DB_OWNER from DBS
+    </select>
+</mapper>

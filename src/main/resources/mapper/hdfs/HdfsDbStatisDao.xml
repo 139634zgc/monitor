@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitauto.bdc.modules.hdfs.dao.HdfsDbStatisDao">
+
+    <resultMap type="com.bitauto.bdc.modules.hdfs.entity.HdfsDbEntity" id="hdfsDbStatisMap">
+        <result property="hdfsDbstatisId" column="hdfs_dbstatis_id"/>
+        <result property="dbOwner" column="db_owner"/>
+        <result property="dbName" column="db_name"/>
+        <result property="dbLocation" column="db_location"/>
+        <result property="dbSize" column="db_size"/>
+        <result property="increaseDisk" column="increase_disk"/>
+        <result property="createDate" column="create_date"/>
+        <result property="createTime" column="createTime"/>
+    </resultMap>
+
+    <select id="queryList" resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsDbEntity">
+        select * from tb_hdfs_dbstatis
+        where create_date=(select create_date from tb_hdfs_dbstatis order by create_date desc limit 1)
+        AND newest = 1
+        <if test="dbName != null and dbName.trim() != ''">
+            AND (`db_name`  = #{dbName} OR `db_owner`  = #{dbName})
+        </if>
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+            <otherwise>
+                order by hdfs_dbstatis_id desc
+            </otherwise>
+        </choose>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="listDiskIncreaseTop" parameterType="hashmap" resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsDbEntity">
+        select * from tb_hdfs_dbstatis where `create_date` = #{createDate} AND newest = 1 order by increase_disk desc limit 11
+    </select>
+
+    <select id="listDiskTop" parameterType="hashmap" resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsDbEntity">
+        select * from tb_hdfs_dbstatis WHERE `create_date`  = #{createDate} AND
+        newest = 1 order by db_size desc limit 11
+    </select>
+
+    <select id="listDiskTopByDateRange" parameterType="hashmap" resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsDbEntity">
+        <![CDATA[select * from tb_hdfs_dbstatis where `create_time` > #{startTime} AND `create_time` < #{endTime}
+        AND newest = 1 order by increase_disk desc limit 10]]>
+    </select>
+
+    <select id="queryTotal" resultType="int">
+        select count(*) from tb_hdfs_dbstatis
+        where create_date=(select create_date from tb_hdfs_dbstatis order by create_date desc limit 1)
+        AND newest = 1
+        <if test="dbName != null and dbName.trim() != ''">
+            AND (`db_name`  = #{dbName} OR `db_owner`  = #{dbName})
+        </if>
+    </select>
+
+    <insert id="save" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="hdfsDbstatisId">
+        insert into tb_hdfs_dbstatis
+        (
+        `db_name`,
+        `db_owner`,
+        `db_location`,
+        `db_size`,
+        `increase_disk`,
+        `create_date`
+        )
+        values
+        (
+        #{dbName},
+        #{dbOwner},
+        #{dbLocation},
+        #{dbSize},
+        #{increaseDisk},
+        #{createDate}
+        )
+    </insert>
+
+    <select id="queryByDbnameAndDate" parameterType="hashmap" resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsDbEntity">
+        select * from tb_hdfs_dbstatis
+        WHERE db_name = #{dbName} and create_date = #{createDate}
+        ORDER BY create_time ASC LIMIT 1
+    </select>
+
+    <update id="updateNewestByDbnameAndDate" parameterType="hashmap">
+        update tb_hdfs_dbstatis set `newest` = 0
+        WHERE db_name = #{dbName} and create_date = #{createDate} AND `newest` = 1
+    </update>
+
+    <select id="queryByDbName"  resultType="com.bitauto.bdc.modules.hdfs.entity.HdfsDbEntity">
+        select * from tb_hdfs_dbstatis
+        WHERE db_name = #{value} and newest = 1
+        ORDER BY create_time DESC LIMIT 1
+    </select>
+
+</mapper>

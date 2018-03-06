@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>任务汇总</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+	<link rel="stylesheet" href="../../css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../css/font-awesome.min.css">
+	<link rel="stylesheet" href="../../plugins/jqgrid/ui.jqgrid-bootstrap.css">
+	<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+	<link rel="stylesheet" href="../../css/main.css">
+	<link rel="stylesheet" href="../../css/table.css">
+	<!-- 引入样式 -->
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+	<script src="../../libs/jquery.min.js"></script>
+	<script src="../../plugins/layer/layer.js"></script>
+	<script src="../../libs/bootstrap.min.js"></script>
+	<script src="../../libs/vue.min.js"></script>
+	<script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
+	<script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
+	<script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
+	<script src="../../js/common.js"></script>
+	<script src="../../js/echarts.min.js"></script>
+	<script src="../../js/themes/customed.js"></script>
+	<!-- 引入组件库 -->
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+	<div class="grid-btn">
+	<div class="form-group col-sm-2">
+	<input type="text" class="form-control"  v-model="q.username" @keyup.enter="query"  placeholder="用户名">
+	</div>
+	<div class="form-group col-sm-2">
+	<el-date-picker class="col-sm-1"
+	v-model="q.startTime"
+	type="date"
+	value-format="yyyy-MM-dd"
+	placeholder="开始时间">
+	</el-date-picker>
+	</div>
+
+	<a class="btn btn-default" @click="query">查询</a>
+	</div>
+	</div>
+
+	<hr width="980px" align="left" id="splitLines">
+	<div
+	style="min-width: 980px; height: 40px; margin-right: 20px" align="right" class="radio" id="timeType">
+	<div class="form-group col-sm-2"  style="width:18%;font-size:18px">
+	<strong>总任务：<span id="jobcount" STYLE="font-family:SimHei"></span></strong>
+	</div>
+	<div class="form-group col-sm-2" style="width:18%;font-size:18px">
+	<strong>成功任务：<span id="succeededcount"/></strong>
+	</div>
+	<div class="form-group col-sm-3" style="width:18%;font-size:18px" >
+	<a href="javascript:;" @click="redirect('modules/oozieserver/wfjobsList.html','failed');" style="color:red;text-decoration: none"><strong>失败任务：<span id="errorcount"/></strong></a>
+	</div>
+	<div class="form-group col-sm-4" style="width:18%;font-size:18px">
+	<a href="javascript:;" @click="redirect('modules/oozieserver/wfjobsList.html','running');" style="color:black;text-decoration: none"><strong>正在运行任务：<span id="runingcount"/></strong></a>
+	</div>
+	<div class="form-group col-sm-5" style="width:18%;font-size:18px">
+	<a href="javascript:;" @click="redirect('modules/oozieserver/wfjobsList.html','waiting');" style="color:black;text-decoration: none"><strong>等待执行任务：<span id="waitingcount"/></strong></a>
+	</div>
+	</div>
+	<hr width="980px" align="left" id="splitLine1">
+	<!--<div id="mem" style="width: 980px; height: 350px;"></div>-->
+
+	<div id="mem" style="width:1024px;height:700px;"></div>
+	<hr width="1256px" align="left" id="splitLine2" style="width: 2856px;height:50px;">
+	<br/>
+	<div id="finishCharDiv" style="width: 980px; height: 350px;"></div>
+	<br/>
+	<div id="executionTimeCharDiv" style="width: 980px; height: 350px;"></div>
+
+</div>
+
+<script src="../../js/modules/oozieserver/oozieCollect.js"></script>
+</body>
+</html>

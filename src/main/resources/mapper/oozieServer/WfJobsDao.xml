@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bitauto.bdc.modules.oozieServer.dao.WfJobsDao">
+
+    <resultMap type="com.bitauto.bdc.modules.oozieServer.entity.WfJobs" id="wfjobsMap">
+        <result property="appName" column="app_name"/>
+        <result property="userName" column="user_name"/>
+    </resultMap>
+
+    <select id="queryTotal" resultType="int">
+        select count(1)
+        from  COORD_JOBS as cj
+        LEFT JOIN   COORD_ACTIONS as ca  on ca.job_id=cj.id
+        LEFT JOIN  WF_JOBS as wj on ca.external_id = wj.id
+        where  1=1
+        <if test="startTime != null and endTime != null">
+            <![CDATA[  and  wj.created_time >= #{startTime} and  wj.created_time<= #{endTime} ]]>
+        </if>
+
+        <if test="usernameList != null">
+            and   cj.user_name in
+            <foreach collection="usernameList" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="succeeded != null">
+            <![CDATA[  and  ca.`status` ='SUCCEEDED']]>
+        </if>
+        <if test="running != null">
+            <![CDATA[  and  ca.`status` ='RUNNING']]>
+        </if>
+        <if test="waiting != null">
+            <![CDATA[  and  ca.`status` ='WAITING']]>
+        </if>
+        <if test="failed  != null">
+            <![CDATA[  and  ( ca.`status` ='FAILED' or ca.`status` ='KILLED' or ca.`status` ='TIMEDOUT' )]]>
+        </if>
+
+        <if test="time_start != null and time_end != null">
+            <![CDATA[  and  round((UNIX_TIMESTAMP(wj.end_time)-UNIX_TIMESTAMP(wj.created_time))/60) >= #{time_start} and round((UNIX_TIMESTAMP(wj.end_time)-UNIX_TIMESTAMP(wj.created_time))/60)<= #{time_end} ]]>
+        </if>
+    </select>
+
+    <select id="queryList" resultType="com.bitauto.bdc.modules.oozieServer.entity.WfJobs">
+        select
+        cj.app_name as appName,
+        wj.created_time as startTime,
+        wj.end_time as endTime,
+        round((UNIX_TIMESTAMP(wj.end_time)-UNIX_TIMESTAMP(wj.created_time))/60) as times,
+        cj.user_name as user_name,
+        ca.`status` as status
+        from  COORD_JOBS as cj
+        LEFT JOIN   COORD_ACTIONS as ca  on ca.job_id=cj.id
+        LEFT JOIN  WF_JOBS as wj on ca.external_id = wj.id
+        where  1=1
+        <if test="startTime != null and endTime != null">
+            <![CDATA[  and  wj.created_time >= #{startTime} and  wj.created_time<= #{endTime} ]]>
+        </if>
+
+        <if test="usernameList != null">
+            and   cj.user_name in
+            <foreach collection="usernameList" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="succeeded != null">
+            <![CDATA[  and  ca.`status` ='SUCCEEDED']]>
+        </if>
+        <if test="running != null">
+            <![CDATA[  and  ca.`status` ='RUNNING']]>
+        </if>
+        <if test="waiting != null">
+            <![CDATA[  and  ca.`status` ='WAITING']]>
+        </if>
+        <if test="failed  != null">
+            <![CDATA[  and  ( ca.`status` ='FAILED' or ca.`status` ='KILLED' or ca.`status` ='TIMEDOUT' )]]>
+        </if>
+
+        <if test="time_start != null and time_end != null">
+            <![CDATA[  and  round((UNIX_TIMESTAMP(wj.end_time)-UNIX_TIMESTAMP(wj.created_time))/60) >= #{time_start} and round((UNIX_TIMESTAMP(wj.end_time)-UNIX_TIMESTAMP(wj.created_time))/60)<= #{time_end} ]]>
+        </if>
+
+        order by wj.created_time desc
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+
+
+
+    <select id="queryListcount" resultType="com.bitauto.bdc.modules.oozieServer.entity.WfJobs">
+        select
+        DATE_FORMAT(wj.created_time,'%Y-%m-%d %H') as xName,
+        count(1) as sum
+        from  COORD_JOBS as cj
+        LEFT JOIN   COORD_ACTIONS as ca  on ca.job_id=cj.id
+        LEFT JOIN  WF_JOBS as wj on ca.external_id = wj.id
+        where  1=1
+        <if test="startTime != null">
+            <![CDATA[  and  date(wj.created_time) = #{startTime} ]]>
+        </if>
+        <if test="username != null">
+            and   cj.user_name in
+            <foreach collection="username" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY DATE_FORMAT(wj.created_time,'%Y-%m-%d %H')
+    </select>
+
+    <select id="queryfinishcount" resultType="com.bitauto.bdc.modules.oozieServer.entity.WfJobs">
+        select
+        DATE_FORMAT(wj.last_modified_time,'%Y-%m-%d %H') as xName,
+        count(1) as sum
+        from  COORD_JOBS as cj
+        LEFT JOIN   COORD_ACTIONS as ca  on ca.job_id=cj.id
+        LEFT JOIN  WF_JOBS as wj on ca.external_id = wj.id
+        where  1=1
+        <if test="startTime != null">
+            <![CDATA[  and  date(wj.last_modified_time) = #{startTime} ]]>
+        </if>
+        <if test="username != null">
+            and   cj.user_name in
+            <foreach collection="username" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY DATE_FORMAT(wj.last_modified_time,'%Y-%m-%d %H')
+    </select>
+
+    <select id="queryExecutionTimecount" resultType="com.bitauto.bdc.modules.oozieServer.entity.WfJobs">
+        select
+        round((UNIX_TIMESTAMP(wj.end_time)-UNIX_TIMESTAMP(wj.created_time))/60) as times,
+        count(1) as sum
+        from COORD_JOBS as cj
+        LEFT JOIN   COORD_ACTIONS as ca on ca.job_id=cj.id
+        LEFT JOIN  WF_JOBS as wj on ca.external_id = wj.id
+        where  1=1
+        <if test="startTime != null">
+            <![CDATA[  and  date(wj.created_time) = #{startTime} ]]>
+        </if>
+
+        <if test="username != null">
+            and   cj.user_name in
+            <foreach collection="username" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY round((UNIX_TIMESTAMP(wj.end_time)-UNIX_TIMESTAMP(wj.created_time))/60)
+    </select>
+
+
+</mapper>

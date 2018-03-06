@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>小文件</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../plugins/jqgrid/ui.jqgrid-bootstrap.css">
+    <link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="../../css/table.css">
+    <script src="../../libs/jquery.min.js"></script>
+    <script src="../../plugins/layer/layer.js"></script>
+    <script src="../../libs/bootstrap.min.js"></script>
+    <script src="../../libs/vue.min.js"></script>
+    <script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
+    <script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
+    <script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
+    <script src="../../js/common.js"></script>
+    <script src="../../js/echarts.min.js"></script>
+    <script src="../../js/themes/customed.js"></script>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div style="position:relative;">
+    <div align="right" id="dateRange" class="radio" style="z-index:999;position:absolute;right:165px;top:-7px;min-width: 900px; height: 40px; margin-right: 20px;">
+        <label style="margin-right: 20px;">1周</label> <input type="radio" name="dateRange" value="week">
+        <label style="margin-right: 23px;">2周</label><input type="radio" name="dateRange" value="2week">
+        <label style="margin-right: 23px;">1月</label><input type="radio" name="dateRange" checked="checked" value="1month">
+        <label style="margin-right: 23px;">3月</label><input type="radio" name="dateRange" value="3month">
+    </div>
+    </div>
+
+    <div id="smallFileChart" style="width: 980px;height: 350px;"></div>
+    <hr width="1256px" align="left" id="splitLine" style="width: 1256px;height:50px;">
+
+    <div id="fileBlockChart" style="width:1124px;height:700px;"></div>
+    <hr width="1256px" align="left" id="splitLine2" style="width: 1256px;height:50px;">
+
+    <div class="grid-btn">
+        <div class="form-group col-sm-2">
+            <input type="text" class="form-control" v-model="q.directory" @keyup.enter="query" placeholder="目录名">
+        </div>
+        <a class="btn btn-default" @click="query">查询</a>
+    </div>
+    <div v-show="showList">
+        <table id="jqGrid" class="table-striped"></table>
+        <div id="jqGridPager"></div>
+    </div>
+</div>
+
+<script src="../../js/modules/hdfs/smallfile.js"></script>
+<script src="../../js/modules/hdfs/smallfile_chart.js"></script>
+</body>
+</html>

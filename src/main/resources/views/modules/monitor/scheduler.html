@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>资源调度情况</title>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link rel="stylesheet" href="../../css/bootstrap.min.css">
+<link rel="stylesheet" href="../../css/font-awesome.min.css">
+<link rel="stylesheet" href="../../plugins/jqgrid/ui.jqgrid-bootstrap.css">
+<link rel="stylesheet" href="../../plugins/ztree/css/metroStyle/metroStyle.css">
+<link rel="stylesheet" href="../../css/main.css">
+<script src="../../libs/jquery.min.js"></script>
+<script src="../../plugins/layer/layer.js"></script>
+<script src="../../libs/bootstrap.min.js"></script>
+<script src="../../libs/vue.min.js"></script>
+<script src="../../plugins/jqgrid/grid.locale-cn.js"></script>
+<script src="../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
+<script src="../../plugins/ztree/jquery.ztree.all.min.js"></script>
+<script src="../../js/common.js"></script>
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			<a v-if="hasPermission('monitor:scheduler:save')" class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			<a v-if="hasPermission('monitor:scheduler:update')" class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			<a v-if="hasPermission('monitor:scheduler:delete')" class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+											<div class="form-group">
+			   	<div class="col-sm-2 control-label">最大可以运行的app数目</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.maxapps" placeholder="最大可以运行的app数目"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">最小内存</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.minresMem" placeholder="最小内存"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">最小cpu核数</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.minresCpu" placeholder="最小cpu核数"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">最大内存</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.maxresMem" placeholder="最大内存"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">最大cpu核数</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.maxresCpu" placeholder="最大cpu核数"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">已经被使用的内存</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.usedresMem" placeholder="已经被使用的内存"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">已经被使用的cpu核数</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.usedresCpu" placeholder="已经被使用的cpu核数"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">固定占用的内存</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.steadyfairresMem" placeholder="固定占用的内存"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">固定占用的cpu核数</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.steadyfairresCpu" placeholder="固定占用的cpu核数"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">共享内存</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.fairresMem" placeholder="共享内存"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">共享cpu核数</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.fairresCpu" placeholder="共享cpu核数"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">集群总内存量</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.clusterresMem" placeholder="集群总内存量"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">集群总cpu核数</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.clusterresCpu" placeholder="集群总cpu核数"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">正在等待分配的容器数</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.pendingcountainers" placeholder="正在等待分配的容器数"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">已经分配的容器数</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.allocatedcontainers" placeholder="已经分配的容器数"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">固定占用的容器数</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.reservedcontainers" placeholder="固定占用的容器数"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">队列名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.queuename" placeholder="队列名称"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">调度策略</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.schedulingpolicy" placeholder="调度策略"/>
+			    </div>
+			</div>
+									<div class="form-group">
+			   	<div class="col-sm-2 control-label">数据插入时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="scheduler.inserttime" placeholder="数据插入时间"/>
+			    </div>
+			</div>
+							<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="../../js/modules/monitor/scheduler.js"></script>
+</body>
+</html>

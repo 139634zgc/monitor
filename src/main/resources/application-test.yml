@@ -1,0 +1,90 @@
+spring:
+    datasource:
+        monitor:
+            type: com.alibaba.druid.pool.DruidDataSource
+            driverClassName: com.mysql.jdbc.Driver
+            url: jdbc:mysql://192.168.15.46:3306/bdc_monitor?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+            username: root
+            password: 123456
+            druid:
+                initial-size: 10
+                max-active: 100
+                min-idle: 10
+                max-wait: 60000
+                pool-prepared-statements: true
+                max-pool-prepared-statement-per-connection-size: 20
+                time-between-eviction-runs-millis: 60000
+                min-evictable-idle-time-millis: 300000
+                validation-query: SELECT 1 FROM DUAL
+                test-while-idle: true
+                test-on-borrow: false
+                test-on-return: false
+                stat-view-servlet:
+                    enabled: true
+                    url-pattern: /druid/*
+                    #login-username: admin
+                    #login-password: admin
+                filter:
+                    stat:
+                        log-slow-sql: true
+                        slow-sql-millis: 1000
+                        merge-sql: true
+                    wall:
+                        config:
+                            multi-statement-allow: true
+
+        hive:
+            type: com.alibaba.druid.pool.DruidDataSource
+            driverClassName: com.mysql.jdbc.Driver
+            url: jdbc:mysql://192.168.15.46:3306/hive_wyx?allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8
+            username: root
+            password: 123456
+            druid:
+                initial-size: 10
+                max-active: 100
+                min-idle: 10
+                max-wait: 60000
+                pool-prepared-statements: true
+                max-pool-prepared-statement-per-connection-size: 20
+                time-between-eviction-runs-millis: 60000
+                min-evictable-idle-time-millis: 300000
+                validation-query: SELECT 1 FROM DUAL
+                test-while-idle: true
+                test-on-borrow: false
+                test-on-return: false
+                stat-view-servlet:
+                    enabled: true
+                    url-pattern: /druid/*
+                    #login-username: admin
+                    #login-password: admin
+                filter:
+                    stat:
+                        log-slow-sql: true
+                        slow-sql-millis: 1000
+                        merge-sql: true
+                    wall:
+                        config:
+                            multi-statement-allow: true
+
+
+
+RESTAPI:
+  OOZIE_BASE_URL: http://223.202.210.83:11000
+  YARN_BASE_URL: http://223.202.210.83:8088/ws/v1/cluster/apps
+  SHCEDULE_BASE_URL: http://23.202.210.83:8088/ws/v1/cluster/scheduler
+
+gateway:
+    hdfsjmx:
+        host: 192.168.15.46:50070
+
+config:
+    schedule-flag: src/main/resources/config/schedule-flag.properties
+
+hdfs:
+    fsimage:
+        delimited-file: "/Users/weiyongxu/Documents/fsimage/hdfs_delimiter_fsimage"
+
+
+LOGIN:
+  YICHE_LOGINURL: https://oa.bitauto.com/hrservices/employee.asmx
+  YICHE_WSDLLOCATION: https://sysapp.bitauto.com/hrservices/employee.asmx?wsdl
